@@ -18,7 +18,6 @@ class MultiSearchListener
      */
     public function onApplyFilterCondition(MultiSearchEvent $event)
     {
-        $queryBuilder = new QueryBuilder();
         
     }
 

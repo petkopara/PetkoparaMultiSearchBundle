@@ -2,7 +2,7 @@
 
 namespace Petkopara\MultiSearchBundle\Search;
 
-use Petkopara\MultiSearchBundle\Event\MultiSearchEvent;
+use Petkopara\MultiSearchBundle\Search\Condition\ConditionBuilder;
 use Symfony\Component\Form\Test\FormInterface;
 
 /**
@@ -13,11 +13,19 @@ use Symfony\Component\Form\Test\FormInterface;
 class MultiSearchUpdater
 {
 
-    public function search(FormInterface $form, $queryBuilder)
-    {
-        // and add filters condition for each node
-        $this->dispatcher->dispatch(MultiSearchEvent::NAME, new MultiSearchEvent($queryBuilder));
+    protected $dispatcher;
 
+    public function __construct($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    public function search($form, $queryBuilder, $className)
+    {
+        $conditionBuilder = new ConditionBuilder($queryBuilder, $className);
+        $searchTerm = $form->get('search')->getData();
+        $queryBuilder = $conditionBuilder->search($searchTerm);
+//        $this->dispatcher->dispatch(MultiSearchEvent::NAME, new MultiSearchEvent($form, $queryBuilder));
         return $queryBuilder;
     }
 
