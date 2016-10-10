@@ -2,6 +2,10 @@
 
 namespace Petkopara\MultiSearchBundle\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 /**
  * Filter type for strings.
  *
@@ -17,10 +21,13 @@ class MultiSearchType extends AbstractType
     {
         $resolver
                 ->setDefaults(array(
+                    'search_fields' => array(),
+                    'search_comparison_type' => 'wildcard',
                     'required' => false,
                     'data_extraction_method' => 'default',
                 ))
                 ->setAllowedValues('data_extraction_method', array('default'))
+                ->setAllowedValues('search_comparison_type', array('wildcard', 'equals'))
         ;
     }
 
@@ -29,7 +36,7 @@ class MultiSearchType extends AbstractType
      */
     public function getParent()
     {
-        return TextType::class;
+        return SearchType::class;
     }
 
     /**
@@ -37,7 +44,7 @@ class MultiSearchType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'multi_search';
+        return 'petkopara_multisearch';
     }
 
 }

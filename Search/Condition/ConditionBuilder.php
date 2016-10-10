@@ -2,28 +2,24 @@
 
 namespace Petkopara\MultiSearchBundle\Search\Condition;
 
-use Doctrine\ORM\EntityManager;
-use Pagerfanta\Pagerfanta;
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Form\FormInterface;
 
 class ConditionBuilder
 {
 
     protected $queryBuilder;
     protected $searchColumns = array();
-
-    /**
-     * Entity name
-     * @var string
-     */
+    protected $searchTerm;
+    protected $searchComparisonType;
+    protected $form;
     protected $entityName;
-
-    /**
-     * @var string
-     */
     protected $idName;
 
-    public function __construct($queryBuilder, $className)
+    public function __construct(FormInterface $form, QueryBuilder $queryBuilder, $className)
     {
+        $this->searchTerm = $form->getData();
+        $this->searchComparisonType = $form->getConfig()->getOption('search_comparison_type');
         $this->queryBuilder = $queryBuilder;
         $this->entityName = $className;
         $this->entityManager = $queryBuilder->getEntityManager();
@@ -32,27 +28,28 @@ class ConditionBuilder
         $metadata = $this->entityManager->getClassMetadata($className);
 
         $this->idName = $metadata->getSingleIdentifierFieldName();
-        foreach ($metadata->fieldMappings as $field) {
-            $this->searchColumns[] = $field['fieldName'];
+
+        $searchFields = $form->getConfig()->getOption('search_fields');
+        if (count($searchFields) > 0) {
+            $this->searchColumns = $searchFields;
+        } else {
+            foreach ($metadata->fieldMappings as $field) {
+                $this->searchColumns[] = $field['fieldName'];
+            }
         }
     }
 
-    /**
-     * @param string $searchQuery
-     * @return \Doctrine\ORM\QueryBuilder
-     */
-    public function search($searchQuery)
+    public function search()
     {
         $alias = $this->queryBuilder->getRootAlias();
         $query = $this->queryBuilder
                 ->select($alias);
 
-        if ($searchQuery == '') {
+        if ($this->searchTerm == '') {
             return $query;
         }
 
-        $searchQuery = str_replace('*', '%', $searchQuery);
-        $searchQueryParts = explode(' ', $searchQuery);
+        $searchQueryParts = explode(' ', $this->getSearchTerm());
 
         $subquery = null;
         $subst = 'a';
@@ -86,7 +83,7 @@ class ConditionBuilder
 
             $subquery = $subqueryInner;
 
-            $query->setParameter($paramPosistion, '%' . $searchQueryPart . '%');
+            $query->setParameter($paramPosistion, $this->getSearchQueryPart($searchQueryPart));
         }
 
         $query->where(
@@ -98,24 +95,20 @@ class ConditionBuilder
         return $query;
     }
 
-    /**
-     * @param string $searchQuery
-     * @return \Pagerfanta\Adapter\DoctrineORMAdapter
-     */
-    public function getPagerfantaAdapter($searchQuery)
+    private function getSearchQueryPart($searchQueryPart)
     {
-        return new PagerfantaAdapter(
-                $this->createDoctrineQueryBuilder($searchQuery), $this->entityManager, $this->entityName
-        );
+        if ($this->searchComparisonType == 'wildcard') {
+            return '%' . $searchQueryPart . '%';
+        }
+        return $searchQueryPart;
     }
 
-    /**
-     * @param string $searchQuery
-     * @return \Pagerfanta\Pagerfanta
-     */
-    public function getPagerfanta($searchQuery)
+    private function getSearchTerm()
     {
-        return new Pagerfanta($this->getPagerfantaAdapter($searchQuery));
+        if ($this->searchComparisonType == 'wildcard') {
+            return $this->searchTerm;
+        }
+        return str_replace('*', '%', $this->searchTerm);
     }
 
 }
