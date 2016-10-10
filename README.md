@@ -1,6 +1,6 @@
 # MultiSearchBundle
 
-This bundle provides basic form type and service for multi search in doctrine entity. 
+This bundle provides basic form type and service for multi search with one input in doctrine entity. 
 
 ##Usage
 
@@ -19,7 +19,7 @@ Create your form type and include the multiSearchType in the buildForm function:
 
 In the controller add call to the multi search service: 
 
-  public function indexAction(Request $request)
+    public function indexAction(Request $request)
     {
         $search = $request->get('search');
         $em = $this->getDoctrine()->getManager();
@@ -65,9 +65,7 @@ Render your form in the view
 The provided type has 2 options:
 
 * `search_fields` - array of the entity columns that will be added in the search. If it's not set then will search in all columns
-* `search_comparison_type` - how to compare the search term. 
-** `wildcard` - it's equivalent to the %search% like search.
-** `equals` - like operator without wildcards. Wildcards still can be used if the search term contains *. 
+* `search_comparison_type` - how to compare the search term. `wildcard` - it's equivalent to the %search% like search. `equals` - like operator without wildcards. Wildcards still can be used if the search term contains *. 
 
 ## Author
 
