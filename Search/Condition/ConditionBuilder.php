@@ -16,16 +16,19 @@ class ConditionBuilder
     protected $entityName;
     protected $idName;
 
-    public function __construct(FormInterface $form, QueryBuilder $queryBuilder, $className)
+    public function __construct(FormInterface $form, QueryBuilder $queryBuilder)
     {
+
+        $this->queryBuilder = $queryBuilder;
+        $this->entityManager = $queryBuilder->getEntityManager();
+        
         $this->searchTerm = $form->getData();
         $this->searchComparisonType = $form->getConfig()->getOption('search_comparison_type');
-        $this->queryBuilder = $queryBuilder;
-        $this->entityName = $className;
-        $this->entityManager = $queryBuilder->getEntityManager();
+        $this->entityName = $form->getConfig()->getOption('class');
+
 
         /** @var $metadata \Doctrine\ORM\Mapping\ClassMetadata */
-        $metadata = $this->entityManager->getClassMetadata($className);
+        $metadata = $this->entityManager->getClassMetadata($this->entityName);
 
         $this->idName = $metadata->getSingleIdentifierFieldName();
 

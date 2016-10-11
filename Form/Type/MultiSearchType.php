@@ -3,8 +3,11 @@
 namespace Petkopara\MultiSearchBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
 
 /**
  * Filter type for strings.
@@ -17,10 +20,21 @@ class MultiSearchType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if (empty($options['class'])) {
+            throw new InvalidConfigurationException('Option "class" must be set.');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
                 ->setDefaults(array(
+                    'class' => '',
                     'search_fields' => array(),
                     'search_comparison_type' => 'wildcard',
                     'required' => false,

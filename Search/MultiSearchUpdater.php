@@ -20,9 +20,9 @@ class MultiSearchUpdater
         $this->dispatcher = $dispatcher;
     }
 
-    public function search($form, $queryBuilder, $className)
+    public function search($form, $queryBuilder)
     {
-        $conditionBuilder = new ConditionBuilder($form, $queryBuilder, $className);
+        $conditionBuilder = new ConditionBuilder($form, $queryBuilder);
         $queryBuilder = $conditionBuilder->search();
 //        $this->dispatcher->dispatch(MultiSearchEvent::NAME, new MultiSearchEvent($form, $queryBuilder));
         return $queryBuilder;
