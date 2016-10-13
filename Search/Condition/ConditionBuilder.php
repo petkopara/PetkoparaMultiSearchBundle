@@ -21,7 +21,7 @@ class ConditionBuilder
 
         $this->queryBuilder = $queryBuilder;
         $this->entityManager = $queryBuilder->getEntityManager();
-        
+
         $this->searchTerm = $form->getData();
         $this->searchComparisonType = $form->getConfig()->getOption('search_comparison_type');
         $this->entityName = $form->getConfig()->getOption('class');
@@ -42,7 +42,11 @@ class ConditionBuilder
         }
     }
 
-    public function search()
+    /**
+     * Search into the entity 
+     * @return Doctrine\ORM\QueryBuilder
+     */
+    public function getQueryBuilderWithConditions()
     {
         $alias = $this->queryBuilder->getRootAlias();
         $query = $this->queryBuilder
@@ -98,6 +102,11 @@ class ConditionBuilder
         return $query;
     }
 
+    /**
+     * Whether to use wildcard or equals search
+     * @param type $searchQueryPart
+     * @return String
+     */
     private function getSearchQueryPart($searchQueryPart)
     {
         if ($this->searchComparisonType == 'wildcard') {
@@ -106,6 +115,7 @@ class ConditionBuilder
         return $searchQueryPart;
     }
 
+    
     private function getSearchTerm()
     {
         if ($this->searchComparisonType == 'wildcard') {

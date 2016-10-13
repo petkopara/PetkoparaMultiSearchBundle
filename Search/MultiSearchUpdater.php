@@ -13,19 +13,11 @@ use Symfony\Component\Form\Test\FormInterface;
 class MultiSearchUpdater
 {
 
-    protected $dispatcher;
-
-    public function __construct($dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
     public function search($form, $queryBuilder)
     {
         $conditionBuilder = new ConditionBuilder($form, $queryBuilder);
-        $queryBuilder = $conditionBuilder->search();
-//        $this->dispatcher->dispatch(MultiSearchEvent::NAME, new MultiSearchEvent($form, $queryBuilder));
-        return $queryBuilder;
+        
+        return $conditionBuilder->getQueryBuilderWithConditions();
     }
 
 }
