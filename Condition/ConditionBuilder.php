@@ -1,50 +1,25 @@
 <?php
 
-namespace Petkopara\MultiSearchBundle\Search\Condition;
+namespace Petkopara\MultiSearchBundle\Condition;
 
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\Form\FormInterface;
 
-class ConditionBuilder
+abstract class ConditionBuilder
 {
 
     protected $queryBuilder;
     protected $searchColumns = array();
     protected $searchTerm;
     protected $searchComparisonType;
-    protected $form;
     protected $entityName;
     protected $idName;
 
-    public function __construct(FormInterface $form, QueryBuilder $queryBuilder)
-    {
-
-        $this->queryBuilder = $queryBuilder;
-        $this->entityManager = $queryBuilder->getEntityManager();
-
-        $this->searchTerm = $form->getData();
-        $this->searchComparisonType = $form->getConfig()->getOption('search_comparison_type');
-        $this->entityName = $form->getConfig()->getOption('class');
-
-
-        /** @var $metadata \Doctrine\ORM\Mapping\ClassMetadata */
-        $metadata = $this->entityManager->getClassMetadata($this->entityName);
-
-        $this->idName = $metadata->getSingleIdentifierFieldName();
-
-        $searchFields = $form->getConfig()->getOption('search_fields');
-        if (count($searchFields) > 0) {
-            $this->searchColumns = $searchFields;
-        } else {
-            foreach ($metadata->fieldMappings as $field) {
-                $this->searchColumns[] = $field['fieldName'];
-            }
-        }
-    }
+    const COMPARISION_TYPE_WILDCARD = 'wildcard';
+    const COMPARISION_TYPE_EQUALS = 'equals';
 
     /**
      * Search into the entity 
-     * @return Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getQueryBuilderWithConditions()
     {
@@ -109,16 +84,15 @@ class ConditionBuilder
      */
     private function getSearchQueryPart($searchQueryPart)
     {
-        if ($this->searchComparisonType == 'wildcard') {
+        if ($this->searchComparisonType == self::COMPARISION_TYPE_WILDCARD) {
             return '%' . $searchQueryPart . '%';
         }
         return $searchQueryPart;
     }
 
-    
     private function getSearchTerm()
     {
-        if ($this->searchComparisonType == 'wildcard') {
+        if ($this->searchComparisonType == self::COMPARISION_TYPE_WILDCARD) {
             return $this->searchTerm;
         }
         return str_replace('*', '%', $this->searchTerm);
