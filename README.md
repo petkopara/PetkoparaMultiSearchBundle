@@ -4,16 +4,22 @@ This bundle provides basic form type and service for multi search with one input
 
 ##Usage
 
+### Form
+
 Create your form type and include the multiSearchType in the buildForm function: 
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
                 ->add('search', MultiSearchType::class, array(
+                    'class' => 'AppBundle:Post', //required
                     'search_fields' => array( //optional, if it's empty it will search in the all entity columns
                         'name',
                         'content'
-            )))
+                     ), 
+                     'comparison_type' = > 'wildcard' //optional, what type of comparison to applied ('wildcard','starts_with', 'ends_with', 'equals')
+                     
+                ))
         ;
     }
 
@@ -24,48 +30,41 @@ In the controller add call to the multi search service:
         $search = $request->get('search');
         $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em->getRepository('AppBundle:Post')->createQueryBuilder('e');
-
-        list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
-
-        return $this->render('post/index.html.twig', array(
-                'posts' =>  $queryBuilder->getQuery()->getResult()
-                'pagerHtml' => $pagerHtml,
-                'filterForm' => $filterForm->createView(),
-        ));
-    }
-
-    /**
-     * Create filter form and process filter request.
-     *
-     */
-    protected function filter($queryBuilder, $request)
-    {
         $filterForm = $this->createForm('AppBundle\Form\PostFilterType');
 
-        // Filter action
-        if ($request->get('filter_action') == 'filter') {
-            // Bind values from the request
-            $filterForm->submit($request->query->get($filterForm->getName()));
+        // Bind values from the request
+        $filterForm->handleRequest($request);
 
-            if ($filterForm->isValid()) {
-                // Build the query from the given form object
-                $this->get('petkopara_multi_search.updater')->search($filterForm->get('search'), $queryBuilder, 'AppBundle:Post');
-            }
-        } 
-
-        return array($filterForm, $queryBuilder);
+        if ($filterForm->isValid()) {
+            // Build the query from the given form object
+            $queryBuilder = $this->get('petkopara_multi_search.builder')->searchForm($queryBuilder, $filterForm->get('search'));
+        }
+        
+        ..
     }
 
 Render your form in the view 
 
     {{ form_rest(filterForm) }}
 
-### MultiSearchType Available Options
+
+### Without form 
+
+    $qb = $em->getRepository('AppBundle:Post')->createQueryBuilder('e');
+    $qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search);
+    
+
+
+## Available Options
 
 The provided type has 2 options:
 
 * `search_fields` - array of the entity columns that will be added in the search. If it's not set then will search in all columns
-* `search_comparison_type` - how to compare the search term. `wildcard` - it's equivalent to the %search% like search. `equals` - like operator without wildcards. Wildcards still can be used if the search term contains *. 
+* `search_comparison_type` -  how to compare the search term.   
+** `wildcard` - it's equivalent to the %search% like search.
+** `equals` - like operator without wildcards. Wildcards still can be used with `equals` if the search term contains *.
+** `starts_with` - it's equivalent to the %search like search.
+** `ends_with` - it's equivalent to the search% like search.
 
 ## Author
 

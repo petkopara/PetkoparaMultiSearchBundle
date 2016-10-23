@@ -1,6 +1,6 @@
 <?php
 
-namespace Petkopara\MultiSearchBundle\Search;
+namespace Petkopara\MultiSearchBundle\Service;
 
 use Doctrine\ORM\QueryBuilder;
 use Petkopara\MultiSearchBundle\Condition\ConditionBuilder;

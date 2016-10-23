@@ -15,6 +15,8 @@ abstract class ConditionBuilder
     protected $idName;
 
     const COMPARISION_TYPE_WILDCARD = 'wildcard';
+    const COMPARISION_TYPE_STARTS_WITH = 'starts_with';
+    const COMPARISION_TYPE_ENDS_WITH = 'ends_with';
     const COMPARISION_TYPE_EQUALS = 'equals';
 
     /**
@@ -23,15 +25,15 @@ abstract class ConditionBuilder
      */
     public function getQueryBuilderWithConditions()
     {
-        $alias = $this->queryBuilder->getRootAlias();
-        $query = $this->queryBuilder
+        $alias = $this->getQueryBuilder()->getRootAlias();
+        $query = $this->getQueryBuilder()
                 ->select($alias);
 
         if ($this->searchTerm == '') {
             return $query;
         }
 
-        $searchQueryParts = explode(' ', $this->getSearchTerm());
+        $searchQueryParts = explode(' ', $this->searchTerm);
 
         $subquery = null;
         $subst = 'a';
@@ -84,18 +86,25 @@ abstract class ConditionBuilder
      */
     private function getSearchQueryPart($searchQueryPart)
     {
-        if ($this->searchComparisonType == self::COMPARISION_TYPE_WILDCARD) {
-            return '%' . $searchQueryPart . '%';
+        switch ($this->searchComparisonType) {
+            case self::COMPARISION_TYPE_WILDCARD:
+                return '%' . $searchQueryPart . '%';
+            case self::COMPARISION_TYPE_STARTS_WITH:
+                return '%' . $searchQueryPart;
+            case self::COMPARISION_TYPE_ENDS_WITH:
+                return $searchQueryPart . '%';
+            default: //equals comparison type
+                return str_replace('*', '%', $searchQueryPart);
         }
-        return $searchQueryPart;
     }
 
-    private function getSearchTerm()
+    /**
+     * 
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getQueryBuilder()
     {
-        if ($this->searchComparisonType == self::COMPARISION_TYPE_WILDCARD) {
-            return $this->searchTerm;
-        }
-        return str_replace('*', '%', $this->searchTerm);
+        return $this->queryBuilder;
     }
 
 }

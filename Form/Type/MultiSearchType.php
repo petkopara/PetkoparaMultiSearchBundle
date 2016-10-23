@@ -2,6 +2,7 @@
 
 namespace Petkopara\MultiSearchBundle\Form\Type;
 
+use Petkopara\MultiSearchBundle\Condition\ConditionBuilder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
@@ -41,7 +42,12 @@ class MultiSearchType extends AbstractType
                     'data_extraction_method' => 'default',
                 ))
                 ->setAllowedValues('data_extraction_method', array('default'))
-                ->setAllowedValues('search_comparison_type', array('wildcard', 'equals'))
+                ->setAllowedValues('search_comparison_type', array(
+                    ConditionBuilder::COMPARISION_TYPE_WILDCARD,
+                    ConditionBuilder::COMPARISION_TYPE_EQUALS,
+                    ConditionBuilder::COMPARISION_TYPE_STARTS_WITH,
+                    ConditionBuilder::COMPARISION_TYPE_ENDS_WITH,
+                    ))
         ;
     }
 
