@@ -62,13 +62,13 @@ The provided type has 2 options:
 * `search_fields` - array of the entity columns that will be added in the search. If it's not set then will search in all columns
 * `search_comparison_type` -  how to compare the search term.   
 
-** `wildcard` - it's equivalent to the %search% like search.
+  * `wildcard` - it's equivalent to the %search% like search.
 
-** `equals` - like operator without wildcards. Wildcards still can be used with `equals` if the search term contains *.
+  * `equals` - like operator without wildcards. Wildcards still can be used with `equals` if the search term contains *.
 
-** `starts_with` - it's equivalent to the %search like search.
-
-** `ends_with` - it's equivalent to the search% like search.
+  * `starts_with` - it's equivalent to the %search like search.
+  
+  * `ends_with` - it's equivalent to the search% like search.
 
 ## Author
 
