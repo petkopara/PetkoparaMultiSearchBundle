@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Petkoparamultisearchbundle by petkopara</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Petkoparamultisearchbundle</h1>
+          <h2>Symfony bundle for Multi Search in entity with form and service.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/petkopara/PetkoparaMultiSearchBundle/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/petkopara/PetkoparaMultiSearchBundle/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/petkopara/PetkoparaMultiSearchBundle" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="multisearchbundle" class="anchor" href="#multisearchbundle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>MultiSearchBundle</h1>
+
+<p>This bundle provides basic form type and service for multi search in doctrine. </p>
+
+<p><a href="https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/build-status/master"><img src="https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/build.png?b=master" alt="Build Status"></a>
+<a href="https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/?branch=master"><img src="https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/quality-score.png?b=master" alt="Scrutinizer Code Quality"></a>
+<a href="https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46"><img src="https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46/mini.png" alt="SensioLabsInsight"></a>
+<a href="https://packagist.org/packages/petkopara/multi-search-bundle"><img src="https://img.shields.io/packagist/v/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square" alt="Latest Stable"></a>
+<a href="https://packagist.org/packages/petkopara/multi-search-bundle"><img src="https://img.shields.io/packagist/dt/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square" alt="Total Downloads"></a></p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<h3>
+<a id="using-composer" class="anchor" href="#using-composer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using composer</h3>
+
+<pre><code>composer require petkopara/multi-search-bundle
+</code></pre>
+
+<p>Add it to the <code>AppKernel.php</code> class:</p>
+
+<pre><code>new Petkopara\MultiSearchBundle\PetkoparaMultiSearchBundle(),
+</code></pre>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a id="form" class="anchor" href="#form" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Form</h3>
+
+<p>Create your form type and include the multiSearchType in the buildForm function: </p>
+
+<pre><code>public function buildForm(FormBuilderInterface $builder, array $options)
+{
+    $builder
+            -&gt;add('search', MultiSearchType::class, array(
+                'class' =&gt; 'AppBundle:Post', //required
+                'search_fields' =&gt; array( //optional, if it's empty it will search in the all entity columns
+                    'name',
+                    'content'
+                 ), 
+                 'comparison_type' = &gt; 'wildcard' //optional, what type of comparison to applied ('wildcard','starts_with', 'ends_with', 'equals')
+
+            ))
+    ;
+}
+</code></pre>
+
+<p>In the controller add call to the multi search service: </p>
+
+<pre><code>public function indexAction(Request $request)
+{
+    $search = $request-&gt;get('search');
+    $em = $this-&gt;getDoctrine()-&gt;getManager();
+    $queryBuilder = $em-&gt;getRepository('AppBundle:Post')-&gt;createQueryBuilder('e');
+    $filterForm = $this-&gt;createForm('AppBundle\Form\PostFilterType');
+
+    // Bind values from the request
+    $filterForm-&gt;handleRequest($request);
+
+    if ($filterForm-&gt;isValid()) {
+        // Build the query from the given form object
+        $queryBuilder = $this-&gt;get('petkopara_multi_search.builder')-&gt;searchForm($queryBuilder, $filterForm-&gt;get('search'));
+    }
+
+    ..
+}
+</code></pre>
+
+<p>Render your form in the view </p>
+
+<pre><code>{{ form_rest(filterForm) }}
+</code></pre>
+
+<h3>
+<a id="without-form" class="anchor" href="#without-form" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Without form</h3>
+
+<pre><code>$qb = $em-&gt;getRepository('AppBundle:Post')-&gt;createQueryBuilder('e');
+$qb = $this-&gt;get('petkopara_multi_search.builder')-&gt;searchEntity($qb, 'AppBundle:Post', $search);
+</code></pre>
+
+<h2>
+<a id="available-options" class="anchor" href="#available-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Available Options</h2>
+
+<p>The provided type has 2 options:</p>
+
+<ul>
+<li>
+<code>search_fields</code> - array of the entity columns that will be added in the search. If it's not set then will search in all columns</li>
+<li>
+<p><code>search_comparison_type</code> -  how to compare the search term.   </p>
+
+<ul>
+<li><p><code>wildcard</code> - it's equivalent to the %search% like search.</p></li>
+<li><p><code>equals</code> - like operator without wildcards. Wildcards still can be used with <code>equals</code> if the search term contains *.</p></li>
+<li><p><code>starts_with</code> - it's equivalent to the %search like search.</p></li>
+<li><p><code>ends_with</code> - it's equivalent to the search% like search.</p></li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="author" class="anchor" href="#author" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Author</h2>
+
+<p>Petko Petkov - <a href="mailto:petkopara@gmail.com">petkopara@gmail.com</a></p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<p>MultiSearchBundle is licensed under the MIT License.</p>
+        </section>
+
+        <footer>
+          Petkoparamultisearchbundle is maintained by <a href="https://github.com/petkopara">petkopara</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
