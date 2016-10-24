@@ -20,7 +20,7 @@ env:
 before_script:
     - composer self-update
     - composer require symfony/framework-bundle:${SYMFONY_VERSION} --no-update
-    - php update
+    - composer update
     
 script:
     - phpunit
