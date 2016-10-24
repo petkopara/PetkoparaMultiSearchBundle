@@ -5,8 +5,24 @@ php:
     - 5.6
     - 7.0
 
+cache:
+    directories:
+        - $HOME/.composer/cache
+matrix:
+    fast_finish: true
+    
+env:
+    - SYMFONY_VERSION=2.6.*
+    - SYMFONY_VERSION=2.8.*
+    - SYMFONY_VERSION=3.0.*
+    
+    
 before_script:
-    - wget http://getcomposer.org/composer.phar
-    - php composer.phar --prefer-source install -o
-
+    - phpenv config-add travis-php.ini
+    - composer self-update
+    - composer require symfony/framework-bundle:${SYMFONY_VERSION} --no-update
+    - php update
+    
+script:
+    - phpunit
 

@@ -57,7 +57,7 @@ abstract class ConditionBuilder
                     ->from($this->entityName, $subst)
                     ->where($whereQuery);
 
-            if ($subquery != null) {
+            if ($subquery !== null) {
                 $subqueryInner->andWhere(
                         $query->expr()->in(
                                 $subst . '.' . $this->idName, $subquery->getQuery()->getDql()
