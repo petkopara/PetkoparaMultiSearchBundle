@@ -10,13 +10,15 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\SchemaTool;
 use Petkopara\MultiSearchBundle\Condition\EntityConditionBuilder;
+use Petkopara\MultiSearchBundle\Condition\FormConditionBuilder;
+use PHPUnit_Framework_TestCase;
 
 /**
  * Test of EntityCondition class
  *
  * @author Petkov Petkov <petkopara@gmail.com>
  */
-class EntityConditionTest extends \PHPUnit_Framework_TestCase
+class EntityConditionTest extends PHPUnit_Framework_TestCase
 {
 
     protected static $em;
@@ -63,13 +65,13 @@ class EntityConditionTest extends \PHPUnit_Framework_TestCase
         return static::$em;
     }
 
-    public function testBuilder()
+    public function testEntityBuilder()
     {
         $queryBuilder = self::getEntityManager()->createQueryBuilder();
         $entityName = __NAMESPACE__ . '\\Post';
 
         $queryBuilder->from($entityName, 'p');
-        $searchTerm = 'search';
+        $searchTerm = 'search test';
         $searchFields = array('name');
         $comparisonType = 'wildcard';
 
@@ -79,8 +81,61 @@ class EntityConditionTest extends \PHPUnit_Framework_TestCase
         $resultQuery = $conditionBuilder->getQueryBuilderWithConditions();
 
         $this->assertEquals(
-                "SELECT p FROM $entityName p WHERE p.id IN(SELECT b.id FROM Petkopara\MultiSearchBundle\Tests\Post b WHERE b.name LIKE ?1)", $resultQuery->getDQL()
+                "SELECT p FROM $entityName p WHERE p.id IN(SELECT c.id FROM $entityName c WHERE c.name LIKE ?2 AND c.id IN(SELECT b.id FROM $entityName b WHERE b.name LIKE ?1))", $resultQuery->getDQL()
         );
+
+        $this->assertEquals('%search%', $resultQuery->getParameter(1)->getValue());
+        $this->assertEquals('%test%', $resultQuery->getParameter(2)->getValue());
+    }
+
+    public function testFormBuilder()
+    {
+        $queryBuilder = self::getEntityManager()->createQueryBuilder();
+        $entityName = __NAMESPACE__ . '\\Post';
+
+        $queryBuilder->from($entityName, 'p');
+
+        $searchTerm = 'search test';
+        $searchFields = array('name');
+        $comparisonType = 'wildcard';
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+                ->disableOriginalConstructor()
+                ->setMethods(array('getData', 'getConfig', 'getOption'))
+                ->getMock();
+        $form->expects($this->any())->method('getData')->will($this->returnValue($searchTerm));
+        $form->expects($this->any())->method('getOption')
+                ->with($this->logicalOr(
+                                $this->equalTo('search_comparison_type'), $this->equalTo('class'), $this->equalTo('search_fields')
+                ))
+                ->will($this->returnCallback(function($param) use ($entityName, $comparisonType, $searchFields) {
+                            if ($param === 'search_comparison_type') {
+                                return $comparisonType;
+                            }
+                            if ($param === 'class') {
+                                return $entityName;
+                            }
+                            if ($param === 'search_fields') {
+                                return $searchFields;
+                            }
+                        }
+        ));
+
+        $form->expects($this->any())
+                ->method($this->anything())  // all other calls return self
+                ->will($this->returnSelf());
+
+
+        $conditionBuilder = new FormConditionBuilder($queryBuilder, $form);
+
+        $resultQuery = $conditionBuilder->getQueryBuilderWithConditions();
+
+        $this->assertEquals(
+                "SELECT p FROM $entityName p WHERE p.id IN(SELECT c.id FROM $entityName c WHERE c.name LIKE ?2 AND c.id IN(SELECT b.id FROM $entityName b WHERE b.name LIKE ?1))", $resultQuery->getDQL()
+        );
+
+        $this->assertEquals('%search%', $resultQuery->getParameter(1)->getValue());
+        $this->assertEquals('%test%', $resultQuery->getParameter(2)->getValue());
     }
 
 }
