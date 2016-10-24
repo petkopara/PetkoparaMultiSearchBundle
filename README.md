@@ -1,9 +1,24 @@
 # MultiSearchBundle
 
-This bundle provides basic form type and service for multi search with one input in doctrine entity. 
+This bundle provides basic form type and service for multi search in doctrine. 
 
 [![Build Status](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/?branch=master)
+[![Latest Stable](https://img.shields.io/packagist/v/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square)](https://packagist.org/packages/petkopara/multi-search-bundle)
+[![Total Downloads](https://img.shields.io/packagist/dt/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square)](https://packagist.org/packages/petkopara/multi-search-bundle)
+
+## Installation 
+
+
+### Using composer
+
+    composer require petkopara/multi-search-bundle
+
+Add it to the `AppKernel.php` class:
+
+    new Petkopara\MultiSearchBundle\PetkoparaMultiSearchBundle(),
+
+
 ##Usage
 
 ### Form
