@@ -4,6 +4,7 @@ This bundle provides basic form type and service for multi search in doctrine.
 
 [![Build Status](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/?branch=master)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46/mini.png)](https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46)
 [![Latest Stable](https://img.shields.io/packagist/v/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square)](https://packagist.org/packages/petkopara/multi-search-bundle)
 [![Total Downloads](https://img.shields.io/packagist/dt/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square)](https://packagist.org/packages/petkopara/multi-search-bundle)
 
