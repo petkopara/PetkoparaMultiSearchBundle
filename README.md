@@ -66,13 +66,20 @@ Render your form in the view
     {{ form_rest(filterForm) }}
 
 
-### Without form 
+### Service
+You can directly use the service and to apply the multi search to any doctrine query builder.
 
-    $qb = $em->getRepository('AppBundle:Post')->createQueryBuilder('e');
-    $qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search);
+    public function indexAction(Request $request)
+    {
+        $search = $request->get('search');
+        $em = $this->getDoctrine()->getManager();
+        
+        $qb = $em->getRepository('AppBundle:Post')->createQueryBuilder('e');
+        $qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search);
+       //$qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search, array('name', 'content'), 'wildcard');
     
-
-
+        ..
+    }
 ## Available Options
 
 The provided type has 2 options:
@@ -87,6 +94,8 @@ The provided type has 2 options:
   * `starts_with` - it's equivalent to the %search like search.
   
   * `ends_with` - it's equivalent to the search% like search.
+  
+These parameters can be applyed to the service as well as 4th and 5th parameter to `searchEntity()` method
 
 ## Author
 
