@@ -2,17 +2,18 @@
 
 This bundle provides basic form type and service for multi search in doctrine. 
 
-## Description
-Search in all of entity columns, just by given search term and entity class/doctrine query builder. 
-In response returns `Doctrine\ORM\QueryBuilder` containing the conditions mapped to the search. 
-The searched columns can be specified. 
-
-
 [![Build Status](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46/mini.png)](https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46)
 [![Latest Stable](https://img.shields.io/packagist/v/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square)](https://packagist.org/packages/petkopara/multi-search-bundle)
 [![Total Downloads](https://img.shields.io/packagist/dt/petkopara/multi-search-bundle.svg?maxAge=2592000?style=flat-square)](https://packagist.org/packages/petkopara/multi-search-bundle)
+
+
+## Description
+Search in all of entity columns by given search term. 
+In response returns `Doctrine\ORM\QueryBuilder` containing the filter conditions for the search. 
+The searched columns can be specified. 
+    
 
 ## Installation 
 
@@ -27,6 +28,21 @@ Add it to the `AppKernel.php` class:
 
 
 ##Usage
+
+### Service
+You can directly use the service and to apply the multi search to any doctrine query builder.
+
+    public function indexAction(Request $request)
+    {
+        $search = $request->get('search');
+        $em = $this->getDoctrine()->getManager();
+        
+        $qb = $em->getRepository('AppBundle:Post')->createQueryBuilder('e');
+        $qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search);
+       //$qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search, array('name', 'content'), 'wildcard');
+    
+        ..
+    }
 
 ### Form
 
@@ -72,20 +88,6 @@ Render your form in the view
     {{ form_rest(filterForm) }}
 
 
-### Service
-You can directly use the service and to apply the multi search to any doctrine query builder.
-
-    public function indexAction(Request $request)
-    {
-        $search = $request->get('search');
-        $em = $this->getDoctrine()->getManager();
-        
-        $qb = $em->getRepository('AppBundle:Post')->createQueryBuilder('e');
-        $qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search);
-       //$qb = $this->get('petkopara_multi_search.builder')->searchEntity($qb, 'AppBundle:Post', $search, array('name', 'content'), 'wildcard');
-    
-        ..
-    }
 ## Available Options
 
 The provided type has 2 options:
