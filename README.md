@@ -2,6 +2,12 @@
 
 This bundle provides basic form type and service for multi search in doctrine. 
 
+## Description
+Search in all of entity columns, just by given search term and entity class/doctrine query builder. 
+In response returns `Doctrine\ORM\QueryBuilder` containing the conditions mapped to the search. 
+The searched columns can be specified. 
+
+
 [![Build Status](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/build.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/petkopara/PetkoparaMultiSearchBundle/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46/mini.png)](https://insight.sensiolabs.com/projects/462874f8-228d-4d9c-951e-e5c001a41c46)

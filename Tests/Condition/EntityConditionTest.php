@@ -3,12 +3,11 @@
 namespace Petkopara\MultiSearchBundle\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\IndexedReader;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\ORM\Configuration;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\Setup;
 use Petkopara\MultiSearchBundle\Condition\EntityConditionBuilder;
 use Petkopara\MultiSearchBundle\Condition\FormConditionBuilder;
 use PHPUnit_Framework_TestCase;
@@ -37,18 +36,12 @@ class EntityConditionTest extends PHPUnit_Framework_TestCase
 //				'path' => 'database.sqlite',
             );
 
-            $cache = new ArrayCache;
-            $config = new Configuration();
-            $config->setMetadataCacheImpl($cache);
-            $config->setQueryCacheImpl($cache);
-            $config->setResultCacheImpl($cache);
-            $config->setProxyDir(sys_get_temp_dir());
-            $config->setProxyNamespace('DoctrineProxies');
-            $config->setAutoGenerateProxyClasses(true);
-            $config->setMetadataDriverImpl(new AnnotationDriver(
-                    new IndexedReader(new AnnotationReader()), __DIR__
-            ));
+            $config = Setup::createConfiguration(true);
+            $driver = new AnnotationDriver(new AnnotationReader(), array(__DIR__));
 
+// registering noop annotation autoloader - allow all annotations by default
+            AnnotationRegistry::registerLoader('class_exists');
+            $config->setMetadataDriverImpl($driver);
 //			$config->setSQLLogger(new EchoSQLLogger());
 
 
