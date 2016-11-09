@@ -1,7 +1,7 @@
 {
     "name": "petkopara/multi-search-bundle",
-    "description": "Symfony3 bundle that provides multi search doctrine query builder for forms and entities .",
-    "keywords": ["multi-search", "query-builder", "symfony3", "doctrine"],
+    "description": "Symfony bundle for Multi Criteria Search for doctrine entities using Form or Service.",
+    "keywords": ["multi-search","criteria", "query builder", "symfony3", "doctrine"],
     "type": "symfony-bundle",
     "homepage": "https://github.com/petkopara/PetkoparaMultiSearchBundle",
     "license": "MIT",
