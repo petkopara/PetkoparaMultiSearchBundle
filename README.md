@@ -57,7 +57,7 @@ Create your form type and include the multiSearchType in the buildForm function:
                         'name',
                         'content'
                      ), 
-                     'comparison_type' = > 'wildcard' //optional, what type of comparison to applied ('wildcard','starts_with', 'ends_with', 'equals')
+                     'search_comparison_type' = > 'wildcard' //optional, what type of comparison to applied ('wildcard','starts_with', 'ends_with', 'equals')
                      
                 ))
         ;
