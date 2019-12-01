@@ -17,8 +17,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('petkopara_multi_search');
+        $treeBuilder = new TreeBuilder('petkopara_multi_search');
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
